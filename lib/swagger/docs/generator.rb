@@ -4,9 +4,9 @@ module Swagger
 
       DEFAULT_VER = "1.0"
       DEFAULT_CONFIG = {
-        :api_file_path => "public/", 
-        :base_path => "/", 
-        :clean_directory => false, 
+        :api_file_path => "public/",
+        :base_path => "/",
+        :clean_directory => false,
         :formatting => :pretty
       }
 
@@ -86,7 +86,7 @@ module Swagger
           FileUtils.mkdir_p(api_file_path) # recursively create out output path
           Dir.foreach(api_file_path) {|f| fn = File.join(api_file_path, f); File.delete(fn) if !File.directory?(fn) and File.extname(fn) == '.json'} if clean_directory # clean output path
 
-          base_path += "/#{controller_base_path}" unless controller_base_path.empty?
+          #base_path += "/#{controller_base_path}" unless controller_base_path.empty?
           header = { :api_version => api_version, :swagger_version => "1.2", :base_path => base_path + "/"}
           resources = header.merge({:apis => []})
 
@@ -111,7 +111,7 @@ module Swagger
               apis << {:path => trim_slashes(get_api_path(trim_leading_slash(route.path.spec.to_s)).gsub("#{controller_base_path}","")), :operations => [operations]}
             end
             demod = "#{debased_path.to_s.camelize}".demodulize.camelize.underscore
-            resource = header.merge({:resource_path => "#{demod}", :apis => apis})
+            resource = header.merge({:resource_path => "#{demod}", :apis => apis, :base_path => '/' + controller_base_path + '/'})
             camelize_keys_deep!(resource)
             # write controller resource file
             write_to_file "#{api_file_path}/#{demod}.json", resource, config
